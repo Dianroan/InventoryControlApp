@@ -35,7 +35,7 @@
                             <input asp-for="usuario.Password" placeholder="Contraseña" class="form-control" type="password" id="passwordInput" required>
                             <span asp-validation-for="usuario.Password" class="text-danger"></span>
                             
-                            <span class="text-danger">@Model.ErrorMessage</span>
+                            <span class="text-danger">@Model.ErrorMessageLogIn</span>
                             <input id="enviar" type="submit" />
                         </div>
                     </form>
@@ -102,10 +102,10 @@
                             </select>
                             <span asp-validation-for="estudiante.PlantelId" class="text-danger"></span>
                             
-                            <input asp-for="usuario.Password" placeholder="Contraseña" type="password" id="passwordInput" required>
+                            <input asp-for="usuario.Password" placeholder="Contraseña" type="password" required>
                             <span asp-validation-for="usuario.Password" class="text-danger"></span>
                             
-                            <span class="text-danger">@Model.ErrorMessage</span>
+                            <span class="text-danger">@Model.ErrorMessageSignIn</span>
                             <input id="enviar" type="submit" />
                         </div>
                     </form>
