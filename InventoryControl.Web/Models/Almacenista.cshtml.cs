@@ -134,7 +134,12 @@ namespace InventoryControlPages
             if ((material is not null) &&  !ModelState.IsValid)
             {
                 if (material.YearEntrada > DateTime.Now.Year){
-                    TempData["ErrorMessage"] = "El campo Año no puede ser mayor que el año actual.";
+                    TempData["ErrorMessageAlmacenista"] = "El campo Año no puede ser mayor que el año actual.";
+                    return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
+                }
+                if(material.ValorHistorico < 0)
+                {
+                    TempData["ErrorMessageAlmacenista"] = "El valor historico no puede ser menor que 0.";
                     return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
                 }
                 CrudFuntions.AddMaterial(material);

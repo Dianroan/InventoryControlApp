@@ -55,6 +55,7 @@ namespace InventoryControlPages
 
         [BindProperty]
         public string typeUser { get; set; }
+        //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
         public string ErrorMessage { get; set; }
 
