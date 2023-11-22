@@ -180,7 +180,7 @@ namespace InventoryControlPages
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(docente.Nombre, "^[a-zA-Z]+$")) //Si tiene caracteres especiales
+                        if (!Regex.IsMatch(docente.Nombre, "^[a-zA-Z ]+$")) //Si tiene caracteres especiales
                         {
                             TempData["ErrorMessage"] = "El campo Nombre solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
@@ -246,7 +246,7 @@ namespace InventoryControlPages
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(estudiante.Nombre, "^[a-zA-Z]+$"))//Si el nombre tiene caracteres especiales
+                        if (!Regex.IsMatch(estudiante.Nombre, "^[a-zA-Z ]+$"))//Si el nombre tiene caracteres especiales
                         {
                             TempData["ErrorMessage"] = "El campo Nombre solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
@@ -318,7 +318,7 @@ namespace InventoryControlPages
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(almacenista.Nombre, "^[a-zA-Z]+$"))
+                        if (!Regex.IsMatch(almacenista.Nombre, "^[a-zA-Z ]+$"))
                         {
                             TempData["ErrorMessage"] = "El campo Nombre solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
