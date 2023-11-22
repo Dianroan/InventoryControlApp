@@ -11,7 +11,7 @@ using AlmacenDataContext;
 
 namespace InventoryControlPages
 {
-    //creamos la clase para este modelo
+    //Clase para el modelo para Almacenista
     public class AlmacenistaModel : PageModel
     {
         //Declaramos la propiedad para la base de datos
@@ -178,6 +178,7 @@ namespace InventoryControlPages
             // Obtener el valor de pedidoId del formulario  
             if ((material is not null) &&  !ModelState.IsValid)
             {
+                //Toma la fecha ingresada y valida que este correcta
                 int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString());
                 switch (validateDate){
                     case 2:
