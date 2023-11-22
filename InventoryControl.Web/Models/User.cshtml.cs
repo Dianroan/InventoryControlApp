@@ -168,6 +168,13 @@ namespace InventoryControlPages
                         break;
                 }
 
+                foreach(var e in db.Estudiantes){
+                    if(e.Correo == estudiante.Correo){
+                        TempData["ErrorMessage"] = "El correo empleado ya tiene un usuario asignado";
+                        return Page();
+                    }
+                }
+
                 estudiante.Adeudo = 0;
                 usuario.Temporal = false;
                 usuario.Usuario1 = UI.GenerateUsername(estudiante.Nombre, estudiante.ApellidoPaterno, estudiante.ApellidoMaterno);

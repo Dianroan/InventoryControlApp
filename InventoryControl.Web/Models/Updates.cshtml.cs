@@ -141,6 +141,11 @@ namespace InventoryControlPages
                         Material Upmaterial = db.Materiales!.FirstOrDefault(c => c.MaterialId == registroId);
                         Upmaterial.ModeloId = material.ModeloId;
                         Upmaterial.Descripcion = material.Descripcion;
+                        if (material.YearEntrada > DateTime.Now.Year)
+                        {
+                            TempData["ErrorMessage"] = "El campo Año no puede ser mayor que el año actual.";
+                            return RedirectToPage("/Updates", new { id = registroId, table = tableId, usuario = userId, tipo = typeUser });
+                        }
                         Upmaterial.YearEntrada = material.YearEntrada;
                         Upmaterial.MarcaId = material.MarcaId;
                         Upmaterial.CategoriaId = material.CategoriaId;

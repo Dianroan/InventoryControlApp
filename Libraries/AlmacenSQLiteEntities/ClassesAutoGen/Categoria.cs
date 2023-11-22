@@ -18,9 +18,9 @@ namespace AlmacenSQLiteEntities
         [Column(TypeName = "int")]
         public int CategoriaId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Nombre es obligatorio.")]
         [Column(TypeName = "nvarchar(50)")]
-        [StringLength(50)]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "El campo Nombre debe tener entre 2 y 50 caracteres.")]
         public string Nombre { get; set; } = null!;
 
         [Column(TypeName = "ntext")]
