@@ -34,6 +34,7 @@ public class UserModel : PageModel
         public Usuario? usuario { get; set; }
         [BindProperty]
         public Estudiante? estudiante {get; set;}
+        //Declaramos como TempData los mensajes de error que se enviara a los usuarios
         [TempData]
         public string ErrorMessageLogIn { get; set; }
         [TempData]

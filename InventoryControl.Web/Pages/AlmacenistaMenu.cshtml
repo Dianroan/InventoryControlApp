@@ -587,13 +587,13 @@
                         <input asp-for="material.Descripcion" placeholder="Descripcion" class="form-control" required>
                         <span asp-validation-for="material.Descripcion" class="text-danger"></span>
                         
-                        <input asp-for="material.YearEntrada" placeholder="Año entrada" class="form-control">
+                        <input asp-for="material.YearEntrada" placeholder="Año entrada" class="form-control" required>
                         <span asp-validation-for="material.YearEntrada" class="text-danger"></span>
 
-                        <input asp-for="material.Serie" placeholder="Serie" class="form-control">
+                        <input asp-for="material.Serie" placeholder="Serie" class="form-control" required>
                         <span asp-validation-for="material.Serie" class="text-danger"></span>
                         
-                        <input type="number" asp-for="material.ValorHistorico" placeholder="Valor Historico" class="form-control">
+                        <input type="number" asp-for="material.ValorHistorico" placeholder="Valor Historico" class="form-control" required>
                         <span asp-validation-for="material.ValorHistorico" class="text-danger"></span>
                         
                         <select asp-for="material.Condicion" placeholder="Condicion" class="fields-table" required>
