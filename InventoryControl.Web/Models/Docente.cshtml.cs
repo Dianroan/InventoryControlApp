@@ -10,17 +10,23 @@ using AlmacenSQLiteEntities;
 using AlmacenDataContext;
 
 namespace InventoryControlPages
-{
+{   
+    //Clase para el modelo de docente
     public class DocenteModel : PageModel
     {
+        //Declaramos la propiedad para la base de datos
         private Almacen db;
 
+        // Constructor que inicializa la base de datos
         public DocenteModel(Almacen context)
         {
             db = context;
         }
 
+        //Declaramos la lista para objetos docentes
         public List<Docente>? docentes { get; set; }
+
+        //Declaramos como Bind property todas las propiedades de enlace que vamos a usar para crear nuevos objetos de sus clases
         [BindProperty]
         public Docente? docente { get; set; }
 
@@ -31,9 +37,12 @@ namespace InventoryControlPages
         public DescPedido? descPedido { get; set; }
         [BindProperty]
         public Categoria? categoria { get; set; }
+
+        //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
         public string ErrorMessageDocente { get; set; }
 
+        //OnGet para obtener los datos del docente con el ID ingresado
         public void OnGet(int id)
         {
             docente = db.Docentes.FirstOrDefault(e => e.DocenteId == id);
@@ -41,6 +50,7 @@ namespace InventoryControlPages
             ViewData["Title"] = "";
         }
 
+        //Funcion OnPost para generar nuevos pedidos
         public IActionResult OnPost()
         {
             try{
@@ -50,6 +60,7 @@ namespace InventoryControlPages
                     TempData["Fecha"] = pedido.Fecha;
                     TempData["HoraDevolucion"] = pedido.HoraDevolucion;
 
+                    //Valida la fecha en la que se realizó el pedido
                     int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
                     switch (validateDate){
                         case 2:
@@ -117,6 +128,8 @@ namespace InventoryControlPages
                 return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
             }
         }
+
+        //Funcion OnPost para aprobar pedidos
         public IActionResult OnPostApprove()
         {
             // Obtener el valor de pedidoId del formulario
@@ -130,6 +143,7 @@ namespace InventoryControlPages
             return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
         }
 
+        //Funcion OnPost para declinar pedidos
         public IActionResult OnPostDecline()
         {
             // Obtener el valor de pedidoId del formulario            

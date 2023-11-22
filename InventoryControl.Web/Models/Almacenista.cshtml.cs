@@ -11,17 +11,22 @@ using AlmacenDataContext;
 
 namespace InventoryControlPages
 {
+    //Clase para el modelo para Almacenista
     public class AlmacenistaModel : PageModel
     {
+        //Declaramos la propiedad para la base de datos
         private Almacen db;
 
+        // Constructor que inicializa la base de datos
         public AlmacenistaModel(Almacen context)
         {
             db = context;
         } 
 
+        //Declaramos la lista para objetos almacenistas
         public List<Almacenista>? almacenistas { get; set; }
 
+        //Declaramos como Bind property todas las propiedades de enlace que vamos a usar para crear nuevos objetos de sus clases
         [BindProperty]
         public Almacenista? almacenista { get; set; }
 
@@ -46,9 +51,11 @@ namespace InventoryControlPages
         public Mantenimiento? mantenimiento { get; set; }
         [BindProperty]
         public ReporteMantenimiento? reporteMantenimiento { get; set; }
+        //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
         public string ErrorMessageAlmacenista { get; set; }
 
+        //OnGet para obtener los datos del almacenista con el ID ingresado
         public void OnGet(int id)
         {
             almacenista = db.Almacenistas.FirstOrDefault(a => a.AlmacenistaId == id);
@@ -66,6 +73,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para aprobar pedidos
         public IActionResult OnPostApprove()
         {
             // Obtener el valor de pedidoId del formulario
@@ -78,13 +86,15 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para declinar pedidos
         public IActionResult OnPostDecline()
         {
-            // Obtener el valor de pedidoId del formulario            
             pedido = db.Pedidos.FirstOrDefault(p => p.PedidoId == int.Parse(Request.Form["pedidoId"]));
+            //Establece el estado del pedido como rechazado
             pedido.Estado = false;
             descPedido = db.DescPedidos.FirstOrDefault(p => p.PedidoId == pedido.PedidoId);
             Estudiante estudiante = db.Estudiantes.FirstOrDefault(e => e.EstudianteId == pedido.EstudianteId);
+            //Envia el Email al alumno diciendo que se declino su solicitud
             UI.SendEmailForOrderState(estudiante,"Datos incorrectos",pedido);
             db.DescPedidos.RemoveRange(descPedido);
             db.Pedidos.RemoveRange(pedido);
@@ -93,6 +103,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para crear nuevas categorías
         public IActionResult OnPostNewCat()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -105,6 +116,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para crear una nueva Marca
         public IActionResult OnPostNewMarca()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -117,6 +129,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para crear un nuevo modelo
         public IActionResult OnPostNewModelo()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -128,6 +141,8 @@ namespace InventoryControlPages
             }
             return Page();
         }
+
+        //Funcion OnPost para crear un nuevo material    
         public IActionResult OnPostNewMaterial()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -144,6 +159,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para crear un nuevo mantenimiento
         public IActionResult OnPostNewMant()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -160,11 +176,13 @@ namespace InventoryControlPages
             return Page();
         }
         
+        //Funcion OnPost para crear un nuevo reporte de mantenimiento
         public IActionResult OnPostNewReportMant()
         {
             // Obtener el valor de pedidoId del formulario  
             if ((material is not null) &&  !ModelState.IsValid)
             {
+                //Toma la fecha ingresada y valida que este correcta
                 int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString());
                 switch (validateDate){
                     case 2:
@@ -200,6 +218,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para borrar una orden
         public IActionResult OnPostDeleteOrder()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -212,6 +231,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para borrar una categoría
         public IActionResult OnPostDeleteCategoria()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -255,6 +275,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para borrar un modelo
         public IActionResult OnPostDeleteModelo()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -300,6 +321,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para borrar una marca
         public IActionResult OnPostDeleteMarca()
         {
             // Obtener el valor de marcaId del formulario            
@@ -345,6 +367,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para borrar material
         public IActionResult OnPostDeleteMaterial()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -380,6 +403,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para borrar un mantenimiento
         public IActionResult OnPostDeleteMant()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -398,6 +422,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para borrar un reporte de mantenimiento
         public IActionResult OnPostDeleteReportMant()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -410,6 +435,7 @@ namespace InventoryControlPages
             return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
         }
 
+        //Funcion OnPost para redirigir a la pagina de Update enviando los datos del mismo
         public IActionResult OnPostUpdate()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -420,6 +446,7 @@ namespace InventoryControlPages
             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
         }
 
+        //Funcion OnPost para redirigir a la pagina de entrega de material enviando los datos
         public IActionResult OnPostEntrega()
         {
             // Obtener el valor de pedidoId del formulario  

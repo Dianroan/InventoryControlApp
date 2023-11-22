@@ -12,17 +12,22 @@ using AlmacenDataContext;
 
 namespace InventoryControlPages
 {
+    //Clase para el modelo de coordinador
     public class CoordinadorModel : PageModel
     {
+        //Declaramos la propiedad para la base de datos
         private Almacen db;
-
+        
+        // Constructor que inicializa la base de datos
         public CoordinadorModel(Almacen context)
         {
             db = context;
         }
 
+        //Declaramos la lista para objetos coordinadores
         public List<Coordinador>? coordinadores { get; set; }
 
+        //Declaramos como Bind property todas las propiedades de enlace que vamos a usar para crear nuevos objetos de sus clases
         [BindProperty]
         public Coordinador? coordinador { get; set; }
 
@@ -56,8 +61,8 @@ namespace InventoryControlPages
         [BindProperty]
         public Mantenimiento? mantenimiento { get; set; }
         [BindProperty]
-        public ReporteMantenimiento? reporteMantenimiento { get; set; }
-        
+        public ReporteMantenimiento? reporteMantenimiento { get; set; }        
+        //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
         public string ErrorMessagePedido { get; set; }
         [TempData]
@@ -71,6 +76,7 @@ namespace InventoryControlPages
         [TempData]
         public string ErrorMessageNewEstudiante { get; set; }
 
+        //OnGet para obtener los datos del coordinador con el ID ingresado
         public void OnGet(int id)
         {
             coordinador = db.Coordinadores.FirstOrDefault(a => a.CoordinadorId == id);
@@ -88,6 +94,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para aprobar pedidos
         public IActionResult OnPostApprove()
         {
             // Obtener el valor de pedidoId del formulario
@@ -100,6 +107,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para declinar pedidos
         public IActionResult OnPostDecline()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -115,13 +123,15 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para generar una nueva orden
         public IActionResult OnPostNewOrder()
         {
             try{
                 
                 if ((pedido is not null) && (descPedido is not null) &&  !ModelState.IsValid)
                 {
-                    int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
+                    //Toma la fecha ingresada y valida que este correcta
+                int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
                     switch (validateDate){
                         case 2:
                             TempData["ErrorMessagePedido"] = "No se permiten selecciones en sábados ni domingos.";
@@ -191,6 +201,7 @@ namespace InventoryControlPages
             }
         }
 
+        //Funcion OnPost para crear nuevas categorías
         public IActionResult OnPostNewCat()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -203,6 +214,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para crear una nueva Marca
         public IActionResult OnPostNewMarca()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -215,6 +227,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para crear un nuevo modelo
         public IActionResult OnPostNewModelo()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -226,6 +239,8 @@ namespace InventoryControlPages
             }
             return Page();
         }
+        
+        //Funcion OnPost para crear un nuevo material    
         public IActionResult OnPostNewMaterial()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -242,6 +257,7 @@ namespace InventoryControlPages
             return Page();
         }
         
+        //Funcion OnPost para crear un nuevo mantenimiento
         public IActionResult OnPostNewMant()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -258,11 +274,13 @@ namespace InventoryControlPages
             return Page();
         }
         
+        //Funcion OnPost para crear un nuevo reporte de mantenimiento
         public IActionResult OnPostNewReportMant()
         {
             // Obtener el valor de pedidoId del formulario  
             if ((material is not null) &&  !ModelState.IsValid)
             {
+                //Toma la fecha ingresada y valida que este correcta
                 int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString());
                 switch (validateDate){
                     case 2:
@@ -298,6 +316,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para crear un nuevo grupo
        public IActionResult OnPostNewGrupo(Grupo grupo)
         {
             // Verifica si el grupo ya existe
@@ -329,10 +348,12 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para crear un nuevo estudiante
         public IActionResult OnPostNewEstudiante()
         {
             if ((estudiante is not null) && !ModelState.IsValid)
             {
+                //Verifica que el registro del usuario sea valido
                 int validationRegister = UI.RegisterValidation(estudiante.EstudianteId);
 
                 switch (validationRegister)
@@ -351,6 +372,7 @@ namespace InventoryControlPages
                         break;
                 }
                 
+                //Verifica que el correo del usuario sea valido
                 int validationEmail = UI.StudentEmailValidation(estudiante.Correo, estudiante.EstudianteId);
 
                 switch (validationEmail)
@@ -386,7 +408,7 @@ namespace InventoryControlPages
                         // No hay error, proceder con la lógica normal
                         break;
                 }
-
+                //Verifia que la contraseña sea valida
                 int validationPassword = UI.PasswordValidation(usuario.Password);
                 
                 switch (validationPassword)
@@ -431,15 +453,19 @@ namespace InventoryControlPages
             }
             return Page();
         }
+
+        //Funcion OnPost para crear un nuevo docente
         public IActionResult OnPostNewDocente()
         {
             if ((estudiante is not null) && !ModelState.IsValid)
             {
+                //Valida que el correo del docente sea valido
                 if(!UI.EmailValidation(docente.Correo)){
                     TempData["ErrorMessageNewDocente"] = "Correo electrónico invalido";
                     return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                 }
 
+                //Valida que la contraseña sea valida
                 int validationPassword = UI.PasswordValidation(usuario.Password);
                 
                 switch (validationPassword)
@@ -483,15 +509,18 @@ namespace InventoryControlPages
             return Page();
         }
         
+        //Funcion OnPost para crear un nuevo almacenista
         public IActionResult OnPostNewAlmacenista()
         {
             if ((estudiante is not null) && !ModelState.IsValid)
             {
+                //Verifica que el Email este correcto
                 if(!UI.EmailValidation(almacenista.Correo)){
                     TempData["ErrorMessageNewAlmacenista"] = "Correo electrónico invalido";
                     return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                 }
 
+                //Verifica que la contraseña sea correcta
                 int validationPassword = UI.PasswordValidation(usuario.Password);
                 
                 switch (validationPassword)
@@ -535,6 +564,7 @@ namespace InventoryControlPages
             return Page();
         }
 
+        //Funcion OnPost para borrar una orden
         public IActionResult OnPostDeleteOrder()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -547,6 +577,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para borrar una categoría
         public IActionResult OnPostDeleteCategoria()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -591,6 +622,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para borrar un modelo
         public IActionResult OnPostDeleteModelo()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -636,6 +668,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para borrar una marca
         public IActionResult OnPostDeleteMarca()
         {
             // Obtener el valor de marcaId del formulario            
@@ -682,6 +715,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new { id = int.Parse(Request.Form["coordinadorId"]) });
         }
 
+        //Funcion OnPost para borrar material
         public IActionResult OnPostDeleteMaterial()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -717,6 +751,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
         
+        //Funcion OnPost para borrar un mantenimiento
         public IActionResult OnPostDeleteMant()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -735,6 +770,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para borrar un reporte de mantenimiento
         public IActionResult OnPostDeleteReportMant()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -747,6 +783,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
         
+        //Funcion OnPost para borrar un grupo
         public IActionResult OnPostDeleteGrupo()
         {
             // Obtener el valor de pedidoId del formulario            
@@ -756,7 +793,8 @@ namespace InventoryControlPages
             TempData["UserType"] = 4;
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
-        
+
+        //Funcion OnPost para borrar un estudiante        
         public IActionResult OnPostDeleteEstudiante()
         {
             // Obtener el valor de estudianteId del formulario            
@@ -781,6 +819,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
         
+        //Funcion OnPost para borrar un docente
         public IActionResult OnPostDeleteDocente()
         {
             // Obtener el valor de estudianteId del formulario            
@@ -805,6 +844,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
         
+        //Funcion OnPost para borrar un Almacenista
         public IActionResult OnPostDeleteAlmacenista()
         {
             // Obtener el valor de estudianteId del formulario            
@@ -820,6 +860,7 @@ namespace InventoryControlPages
             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
         }
 
+        //Funcion OnPost para redirigir a la pagina de Update enviando los datos del mismo
         public IActionResult OnPostUpdate()
         {
             // Obtener el valor de pedidoId del formulario  
@@ -829,6 +870,8 @@ namespace InventoryControlPages
             string typeUser = "Coordinador";
             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
         }
+
+        //Funcion OnPost para redirigir a la pagina de entrega de material enviando los datos
         public IActionResult OnPostEntrega()
         {
             // Obtener el valor de pedidoId del formulario  

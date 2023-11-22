@@ -12,24 +12,24 @@ using InventoryControl.UI;
 
 namespace InventoryControlPages
 {
-    public class UserModel : PageModel
+public class UserModel : PageModel
     {
-        private Almacen db;
+        private Almacen db; //Se crea la referencia a la bd de almacen
 
         public UserModel(Almacen context)
         {
-            db = context;
+            db = context; //Se pasa el contexto de la bd al modelo mediante un constructor
         }
-
+ //Se crean las propiedades de  las tablas
         public List<Usuario>? usuarios { get; set; }
         public List<Estudiante>? estudiantes { get; set; }
 
         public void OnGet()
         {
-            CrudFuntions.CalcularAdeudo();
-            ViewData["Title"] = "LogIn";
+            CrudFuntions.CalcularAdeudo(); //Se obtiene la función de calcular adeudo 
+            ViewData["Title"] = "LogIn"; 
         }
-
+        //Se vinculan las propiedades con los campos de la tabla. Se
         [BindProperty]
         public Usuario? usuario { get; set; }
         [BindProperty]
@@ -41,23 +41,24 @@ namespace InventoryControlPages
 
         public IActionResult OnPostLogIn()
         {
-            if ((usuario is not null) &&!ModelState.IsValid)
+            if ((usuario is not null) &&!ModelState.IsValid) //Si el usuario no es nulo y el estado de el modelo es válido
+            //Para definir que un modelo es válido, se realizan diferentes comprobaciones, que en nuestro caso es que los datos no estén vacíos, formatos, etc
             {
                 // Llama a la función de login desde tu programa de consola
                 var result = UI.LogIn(usuario.Usuario1, usuario.Password);
 
-                if(result.typeOfUser == 0){
-                    TempData["ErrorMessageLogIn"] = "Usuario o contraseña incorrectos. Inténtalo nuevamente.";
+                if(result.typeOfUser == 0){ //
+                    TempData["ErrorMessageLogIn"] = "Usuario o contraseña incorrectos. Inténtalo nuevamente."; //Al errormessage le pone este valor
                 }
 
                 if (result.usuarioEncontrado != null)
                 {
                     // Almacena la información del usuario en TempData
                     TempData["UserName"] = result.usuarioEncontrado.Usuario1;
-                    TempData["UserType"] = result.typeOfUser;
+                    TempData["UserType"] = result.typeOfUser; 
                     switch(result.typeOfUser){
                         case 0:
-                            TempData["ErrorMessageLogIn"] = "Usuario y/o Contraseña incorrecta";
+                            TempData["ErrorMessageLogIn"] = "Usuario y/o Contraseña incorrecta"; //Según los diferentes tipos de usuario que se puedan encontrar, se direcciona al menú correspondiente con su id
                             return Page();
                         case 1:
                             Docente? docente = db.Docentes!.FirstOrDefault(r => r.UsuarioId == result.usuarioEncontrado.UsuarioId);
@@ -81,12 +82,12 @@ namespace InventoryControlPages
 
         public IActionResult OnPostSignIn()
         {
-            if ((estudiante is not null) && !ModelState.IsValid)
+            if ((estudiante is not null) && !ModelState.IsValid) //Verifica que haya un usuario y que el modelo sea válido
             {
-                int validationRegister = UI.RegisterValidation(estudiante.EstudianteId);
+                int validationRegister = UI.RegisterValidation(estudiante.EstudianteId); //Se llama el método de register validation y se usa con el id de el estudiante 
 
                 switch (validationRegister)
-                {
+                { //Se verifican los diferentes errores que puede tener el registro, estos errores están descritos en otro archivo
                     case 1:
                         break;
                     case 10:
@@ -100,10 +101,12 @@ namespace InventoryControlPages
                         return Page();
                 }
                 
-                int validationEmail = UI.StudentEmailValidation(estudiante.Correo, estudiante.EstudianteId);
+                int validationEmail = UI.StudentEmailValidation(estudiante.Correo, estudiante.EstudianteId); //Se llama el método de email validation y se usa con el correo y el id de el estudiante
 
                 switch (validationEmail)
-                {
+                {                
+            //Se verifican los diferentes errores que puede tener el email, estos errores están descritos en otro archivo
+
                     case 1:
                         break;
                     case 10:
@@ -139,6 +142,8 @@ namespace InventoryControlPages
                 
                 switch (validationPassword)
                 {
+                //Se verifican los diferentes errores que puede tener la contraseña, estos errores están descritos en otro archivo
+
                     case 1:
                         // No hay error, proceder con la lógica normal
                         break;
@@ -175,22 +180,23 @@ namespace InventoryControlPages
                     }
                 }
 
+                 //Se genera un adeudo de estudiante, se señala que el usuario no es temporal, se genera un nombre de usuario y se añade a la bd
                 estudiante.Adeudo = 0;
                 usuario.Temporal = false;
                 usuario.Usuario1 = UI.GenerateUsername(estudiante.Nombre, estudiante.ApellidoPaterno, estudiante.ApellidoMaterno);
                 TempData["UserName"] = usuario.Usuario1;
                 CrudFuntions.AddStudent(estudiante, usuario);
-                UI.NotificationUserName(estudiante);
+                UI.NotificationUserName(estudiante); //Se llama el método de notificar al usuario y se le pasa el objeto estudiante
                 return RedirectToPage("/index", usuario.Usuario1);
             }
             TempData["ErrorMessageSignIn"] = "No se pudo hacer el registro del estudiante.";
-            return Page();
+            return Page(); //Se regresa a la página actual
         }
         public IActionResult OnPostPass()
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) //Si el modelo es válido 
             {
-                return RedirectToPage("/PasswordPage");
+                return RedirectToPage("/PasswordPage"); //Se va a la página de olvidar contraseña
             }
             return Page();
         }

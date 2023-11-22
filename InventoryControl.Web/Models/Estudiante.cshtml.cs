@@ -11,17 +11,22 @@ using AlmacenDataContext;
 
 namespace InventoryControlPages
 {
+    //Clase para el modelo de estudiante
     public class EstudianteModel : PageModel
     {
+        //Declaramos la propiedad para la base de datos
         private Almacen db;
 
+        // Constructor que inicializa la base de datos
         public EstudianteModel(Almacen context)
         {
             db = context;
         }
 
+        //Declaramos la lista para objetos estudiantes
         public List<Estudiante>? estudiantes { get; set; }
 
+        //Declaramos como Bind property todas las propiedades de enlace que vamos a usar para crear nuevos objetos de sus clases
         [BindProperty]
         public Estudiante? estudiante { get; set; }
         [BindProperty]
@@ -31,8 +36,12 @@ namespace InventoryControlPages
         public DescPedido? descPedido { get; set; }
         [BindProperty]
         public Categoria? categoria { get; set; }
+        
+        //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
         public string ErrorMessageEstudiante { get; set; }
+        
+        //OnGet para obtener los datos del estudiante con el ID ingresado
         public void OnGet(int id)
         {
             estudiante = db.Estudiantes.FirstOrDefault(e => e.EstudianteId == id);
@@ -40,6 +49,7 @@ namespace InventoryControlPages
             ViewData["Title"] = "";
         }
 
+        //Funcion OnPost para generar una nueva orden
         public IActionResult OnPostNewOrder()
         {
             try{
@@ -49,7 +59,7 @@ namespace InventoryControlPages
                     TempData["UserType"] = 2;
                     TempData["Fecha"] = pedido.Fecha;
                     TempData["HoraDevolucion"] = pedido.HoraDevolucion;
-
+                    //Toma la fecha ingresada y valida que este correcta
                     int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
                     switch (validateDate){
                         case 2:

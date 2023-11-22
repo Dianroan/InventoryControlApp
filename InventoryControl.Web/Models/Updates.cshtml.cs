@@ -10,18 +10,18 @@ using System.Text.RegularExpressions;
 using AlmacenSQLiteEntities;
 using AlmacenDataContext;
 
-namespace InventoryControlPages
+namespace InventoryControlPages 
 {
     public class UpdatesModel : PageModel
     {
-        private Almacen db;
+        private Almacen db; 
 
         public UpdatesModel(Almacen context)
         {
-            db = context;
+            db = context; //Se pasa el contexto de la base de datos a el modelo
         }
 
-        [BindProperty]
+        [BindProperty] //Se vinculan todas las propiedades con la página
         public Categoria? categoria { get; set; } //1
 
         [BindProperty]
@@ -58,14 +58,14 @@ namespace InventoryControlPages
         [TempData]
         public string ErrorMessage { get; set; }
 
-        public void OnGet(int id, string table, int usuario, string tipo)
+        public void OnGet(int id, string table, int usuario, string tipo) //En el onget, se crean estas variables
         {
-            tabla = table;
+            tabla = table; //Se reciben las variables en las creadas en el onget
             userId = usuario;
             typeUser = tipo;
 
             switch (table)
-            {
+            { 
                 case "categoria":
                     categoria = db.Categorias!.FirstOrDefault(c => c.CategoriaId == id);
                     break;
@@ -101,11 +101,12 @@ namespace InventoryControlPages
 
         public IActionResult OnPost()
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) //Si el modelo es válido, se verifica si el usuario que quiere hace el update es almacenista o coordinador
             {
                 TempData["UserType"] = 3;
                 if(Request.Form["typeUser"] == "Almacenista"){
-                    return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["userId"])});
+                    return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["userId"])}); //Y se manda al menú de cada usuario respectivamente cuidando que se guarde el id
+                //Ojo, en el redirect to page, al hacer el new, se guarda el id de el usuario en la url de la página, y se obtiene de el userId 
                 }
                 else if(Request.Form["typeUser"] == "Coordinador"){
                     return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["userId"])});
@@ -117,8 +118,8 @@ namespace InventoryControlPages
         public IActionResult OnPostUpdate()
         {
             if (!ModelState.IsValid)
-            {
-                int registroId = int.Parse(Request.Form["registroId"]);
+            {   //Se obtienen los datos que el usuario está usando 
+                int registroId = int.Parse(Request.Form["registroId"]); 
                 string tableId = Request.Form["tableId"];
                 int userId = int.Parse(Request.Form["userId"]);
                 string typeUser = Request.Form["typeUser"];
@@ -126,11 +127,11 @@ namespace InventoryControlPages
                 
                 if (string.IsNullOrEmpty(registroIdString)){
                     // Manejo de error: registroId es nulo o vacío
-                    TempData["ErrorMessage"] = "El registroId no puede ser nulo o vacío.";
-                    return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
+                    TempData["ErrorMessage"] = "El registroId no puede ser nulo o vacío."; //Se crea un dato temporal donde se almacena esa string
+                    return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser}); //Se regresa a la página con todos los datos que el usuario estaba manejando
                 }
 
-                switch (tableId){
+                switch (tableId){ //Dependiendo de qué tabla se quiere mostrar, buscan las propiedades de cada tabla
                     case "categoria":
                         Categoria Upcategoria = db.Categorias!.FirstOrDefault(c => c.CategoriaId == registroId);
                         Upcategoria.Nombre = categoria.Nombre;
@@ -141,11 +142,6 @@ namespace InventoryControlPages
                         Material Upmaterial = db.Materiales!.FirstOrDefault(c => c.MaterialId == registroId);
                         Upmaterial.ModeloId = material.ModeloId;
                         Upmaterial.Descripcion = material.Descripcion;
-                        if (material.YearEntrada > DateTime.Now.Year)
-                        {
-                            TempData["ErrorMessage"] = "El campo Año no puede ser mayor que el año actual.";
-                            return RedirectToPage("/Updates", new { id = registroId, table = tableId, usuario = userId, tipo = typeUser });
-                        }
                         Upmaterial.YearEntrada = material.YearEntrada;
                         Upmaterial.MarcaId = material.MarcaId;
                         Upmaterial.CategoriaId = material.CategoriaId;
@@ -160,140 +156,141 @@ namespace InventoryControlPages
                         Upmarca.Descripcion = marca.Descripcion;
                         break;
                     case "modelo":
-                        Modelo Upmodelo = db.Modelos!.FirstOrDefault(c => c.ModeloId == registroId);
+                        Modelo Upmodelo = db.Modelos!.FirstOrDefault(c => c.ModeloId == registroId); //Se crea un objeto llamado modelos de tipo Modelos, o se la tabla de modelo en la db
                         Upmodelo.Nombre = modelo.Nombre;
                         Upmodelo.Descripcion = modelo.Descripcion;
                         break;
                     case "docente":
                         Docente Updocente = db.Docentes!.FirstOrDefault(d => d.DocenteId == registroId);
-                        if(!UI.EmailValidation(docente.Correo)){
-                            TempData["ErrorMessage"] = "Correo electrónico invalido";
+                        if(!UI.EmailValidation(docente.Correo)){ //Si no se valida el correo electrónico correctamente
+                            TempData["ErrorMessage"] = "Correo electrónico invalido"; //Muestra el mensaje y se redirecciona a la página con los datos que el usuario está usando
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
                         // Validación del campo Nombre
-                        if (string.IsNullOrWhiteSpace(docente.Nombre))
+                        if (string.IsNullOrWhiteSpace(docente.Nombre))//Si está en blanco el espacio
                         {
                             TempData["ErrorMessage"] = "El campo Nombre es obligatorio.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (docente.Nombre.Length < 2 || docente.Nombre.Length > 50)
+                        if (docente.Nombre.Length < 2 || docente.Nombre.Length > 50) //Si tiene menos de 2 caracteres o más de 50
                         {
                             TempData["ErrorMessage"] = "El campo Nombre debe tener entre 2 y 50 caracteres.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(docente.Nombre, "^[a-zA-Z ]+$"))
+                        if (!Regex.IsMatch(docente.Nombre, "^[a-zA-Z ]+$")) //Si tiene caracteres especiales
                         {
                             TempData["ErrorMessage"] = "El campo Nombre solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
                         // Validación del campo ApellidoPaterno
-                        if (string.IsNullOrWhiteSpace(docente.ApellidoPaterno))
+                        if (string.IsNullOrWhiteSpace(docente.ApellidoPaterno)) //Si el espacio está en blanco
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoPaterno es obligatorio.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (docente.ApellidoPaterno.Length < 2 || docente.ApellidoPaterno.Length > 50)
+                        if (docente.ApellidoPaterno.Length < 2 || docente.ApellidoPaterno.Length > 50) //Si el apellido tiene menos de 2 caracteres o más de 50 caracteres
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoPaterno debe tener entre 2 y 50 caracteres.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(docente.ApellidoPaterno, "^[a-zA-Z]+$"))
+                        if (!Regex.IsMatch(docente.ApellidoPaterno, "^[a-zA-Z]+$")) //Si el apellido tiene caracteres especiales
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoPaterno solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
                         // Validación del campo ApellidoMaterno
-                        if (string.IsNullOrWhiteSpace(docente.ApellidoMaterno))
+                        if (string.IsNullOrWhiteSpace(docente.ApellidoMaterno))//Si el espacio está en blanco
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoMaterno es obligatorio.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (docente.ApellidoMaterno.Length < 2 || docente.ApellidoMaterno.Length > 50)
+                        if (docente.ApellidoMaterno.Length < 2 || docente.ApellidoMaterno.Length > 50)//Si el apellido tiene menos de 2 caracteres o más de 50 caracteres
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoMaterno debe tener entre 2 y 50 caracteres.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(docente.ApellidoMaterno, "^[a-zA-Z]+$"))
+                        if (!Regex.IsMatch(docente.ApellidoMaterno, "^[a-zA-Z]+$"))//Si el apellido tiene caracteres especiales
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoMaterno solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
                         Updocente.Nombre = docente.Nombre;
-                        Updocente.ApellidoPaterno = docente.ApellidoPaterno;
+                        Updocente.ApellidoPaterno = docente.ApellidoPaterno; //Si pasa esas validaciones, se actualizan los valores a la bd
                         Updocente.ApellidoMaterno = docente.ApellidoMaterno;
                         Updocente.Correo = docente.Correo;
                         Updocente.PlantelId = docente.PlantelId;
                         break;
                     case "estudiante":
-                        Estudiante Upestudiante = db.Estudiantes!.FirstOrDefault(d => d.EstudianteId == registroId);
+                        Estudiante Upestudiante = db.Estudiantes!.FirstOrDefault(d => d.EstudianteId == registroId); //Se crea un objeto de tipo estudiante, que tiene las propiedades de la tabla estudiante
                         
                         // Validación del campo Nombre
-                        if (string.IsNullOrWhiteSpace(estudiante.Nombre))
+                        if (string.IsNullOrWhiteSpace(estudiante.Nombre))//Si el espacio está en blanco
                         {
                             TempData["ErrorMessage"] = "El campo Nombre es obligatorio.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (estudiante.Nombre.Length < 2 || estudiante.Nombre.Length > 50)
+                        if (estudiante.Nombre.Length < 2 || estudiante.Nombre.Length > 50)//Si el nombre tiene menos de 2 caracteres o más de 50 caracteres
                         {
                             TempData["ErrorMessage"] = "El campo Nombre debe tener entre 2 y 50 caracteres.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(estudiante.Nombre, "^[a-zA-Z ]+$"))
+                        if (!Regex.IsMatch(estudiante.Nombre, "^[a-zA-Z ]+$"))//Si el nombre tiene caracteres especiales
                         {
                             TempData["ErrorMessage"] = "El campo Nombre solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
                         // Validación del campo ApellidoPaterno
-                        if (string.IsNullOrWhiteSpace(estudiante.ApellidoPaterno))
+                        if (string.IsNullOrWhiteSpace(estudiante.ApellidoPaterno))//Si el espacio está en blanco
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoPaterno es obligatorio.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (estudiante.ApellidoPaterno.Length < 2 || estudiante.ApellidoPaterno.Length > 50)
+                        if (estudiante.ApellidoPaterno.Length < 2 || estudiante.ApellidoPaterno.Length > 50)//Si el apellido tiene menos de 2 caracteres o más de 50 caracteres
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoPaterno debe tener entre 2 y 50 caracteres.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(estudiante.ApellidoPaterno, "^[a-zA-Z]+$"))
+                        if (!Regex.IsMatch(estudiante.ApellidoPaterno, "^[a-zA-Z]+$"))//Si el apellido tiene caracteres que no sean solo letras
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoPaterno solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
                         // Validación del campo ApellidoMaterno
-                        if (string.IsNullOrWhiteSpace(estudiante.ApellidoMaterno))
+                        if (string.IsNullOrWhiteSpace(estudiante.ApellidoMaterno))//Si el espacio está en blanco
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoMaterno es obligatorio.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (estudiante.ApellidoMaterno.Length < 2 || estudiante.ApellidoMaterno.Length > 50)
+                        if (estudiante.ApellidoMaterno.Length < 2 || estudiante.ApellidoMaterno.Length > 50)//Si el apellido tiene menos de 2 caracteres o más de 50 caracteres
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoMaterno debe tener entre 2 y 50 caracteres.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
 
-                        if (!Regex.IsMatch(estudiante.ApellidoMaterno, "^[a-zA-Z]+$"))
+                        if (!Regex.IsMatch(estudiante.ApellidoMaterno, "^[a-zA-Z]+$"))//Si el apellido tiene caracteres que no sean solo letras
                         {
                             TempData["ErrorMessage"] = "El campo ApellidoMaterno solo debe contener letras.";
                             return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                         }
-                        
+                        //Si completa las validaciones, entonces se guardan los datos en la bd
+                    
                         Upestudiante.Nombre = estudiante.Nombre;
                         Upestudiante.ApellidoPaterno = estudiante.ApellidoPaterno;
                         Upestudiante.ApellidoMaterno = estudiante.ApellidoMaterno;
@@ -376,32 +373,32 @@ namespace InventoryControlPages
                         Upmantenimiento.Nombre = mantenimiento.Nombre;
                         Upmantenimiento.Descripcion = Upmantenimiento.Descripcion;
                         break;
-                    case "reporteMantenimiento":
+                    case "reporteMantenimiento": //Se crea el objeto UpreporteMantenimiento de la table ReporteMantenimientos y busca su id
                         ReporteMantenimiento UpreporteMantenimiento = db.ReporteMantenimientos!.FirstOrDefault(c => c.ReporteMantenimientoId == registroId);
-                        int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString());
+                        int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString()); //Se crea una validación que detecta que la fecha está ingresada en el formato
                         switch (validateDate){
                             case 2:
-                                TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                                TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos."; //Si se da el caso 2 de unit test, que es que se ponga ne sábado o domingo:
                                 return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                             case 3:
-                                TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                                TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana."; //Si se pone el mismo día la fecha o mucho después
                                 return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                             case 4:
-                                TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo.";
+                                TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo."; //Si se escribe mal la fecha
                                 return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                             case 5:
-                                TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo.";
+                                TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo."; //Si se escribe mal la fecha
                                 return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
                             case 1:
                                 // No hay error, proceder con la lógica normal
                                 break;
                         }
-                        UpreporteMantenimiento.Fecha = reporteMantenimiento.Fecha;
+                        UpreporteMantenimiento.Fecha = reporteMantenimiento.Fecha; //Se guarda la fecha en la bd
                         break;
                     default:
                         break;
                 }
-                db.SaveChanges();
+                db.SaveChanges(); //Se guardan los cambios en la bd y se regresa a el menú de updates con los datos de el usuario actual
                 return RedirectToPage("/Updates", new{id = registroId, table = tableId, usuario = userId, tipo = typeUser});
             }
             return Page();
