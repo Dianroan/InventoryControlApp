@@ -178,7 +178,7 @@ public static partial class UI
             emailSender.setSubject("Nombre de Usuario, registrado con exito");
             string message = "Completaste tu registro. \n";
             message += $"Tú nombre de usuario es el siguiente.\n";
-            message += $"Nombre de Usuario: {estudiante.Correo}";
+            message += $"Nombre de Usuario: {estudiante.Usuario.Usuario1}";
             emailSender.setBody(message, containsHTML: false);
             emailSender.sendMail();
         }

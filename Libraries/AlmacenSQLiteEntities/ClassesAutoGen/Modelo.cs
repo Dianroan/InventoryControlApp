@@ -20,7 +20,7 @@ namespace AlmacenSQLiteEntities
 
         [Required]
         [Column(TypeName = "nvarchar(50)")]
-        [StringLength(50)]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "El campo Modelo debe tener entre 5 y 50 caracteres.")]
         public string Nombre { get; set; } = null!;
 
         [Column(TypeName = "ntext")]

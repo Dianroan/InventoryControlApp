@@ -107,70 +107,78 @@ namespace InventoryControlPages
 
         public IActionResult OnPostNewOrder()
         {
-            if ((pedido is not null) && (descPedido is not null) &&  !ModelState.IsValid)
-            {
-                int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
-                switch (validateDate){
-                    case 2:
-                        TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
-                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                    case 3:
-                        TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
-                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                    case 4:
-                        TempData["ErrorMessage"] = "Formato de Fecha Incorrecto.";
-                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                    case 5:
-                        TempData["ErrorMessage"] = "Rellene todos los espacios.";
-                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                    case 1:
-                        // No hay error, proceder con la lógica normal
-                        break;
-                }
-
-                if(UI.HourValidation(pedido.Fecha.ToString()) == false){
-                    TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
-                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                }
-
-                pedido.HoraEntrega = pedido.Fecha;
-
-                if(UI.HourValidation(pedido.HoraDevolucion.ToString()) == false){
-                    TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
-                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                }
-
-                if(pedido.HoraDevolucion <= pedido.HoraEntrega){
-                    TempData["ErrorMessage"] = "La hora de devolución debe ser posterior a la hora de entrega.";
-                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                }
-
-                descPedido.MaterialId = UI.GetMaterialID(categoria.CategoriaId);
-                WriteLine($"{descPedido.MaterialId} |   {categoria.CategoriaId}");
-
-                if(descPedido.MaterialId is null || descPedido.MaterialId == 0){
-                    TempData["ErrorMessage"] = "Ese material no esta disponible.";
-                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                }
-
-                if(descPedido.Cantidad < 1){
-                    TempData["ErrorMessage"] = "No puedes introducir números negativos";
-                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                }
-                else if(descPedido.Cantidad > 10){
-                    TempData["ErrorMessage"] = "No puedes poner un cantidad tan grande de materiales";
-                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
-                }
-
-                WriteLine($"{pedido.CoordinadorId}");
-                CrudFuntions.AddPedido(pedido, descPedido);
-
-                pedido.Estado = true;
+            try{
                 
-                TempData["UserType"] = 4;
+                if ((pedido is not null) && (descPedido is not null) &&  !ModelState.IsValid)
+                {
+                    int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
+                    switch (validateDate){
+                        case 2:
+                            TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                            return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                        case 3:
+                            TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                            return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                        case 4:
+                            TempData["ErrorMessage"] = "Formato de Fecha Incorrecto.";
+                            return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                        case 5:
+                            TempData["ErrorMessage"] = "Rellene todos los espacios.";
+                            return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                        case 1:
+                            // No hay error, proceder con la lógica normal
+                            break;
+                    }
+
+                    pedido.HoraEntrega = pedido.Fecha;
+
+                    if(UI.HourValidation(pedido.HoraEntrega.ToString()) == false){
+                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                    }
+
+
+                    if(UI.HourValidation(pedido.HoraDevolucion.ToString()) == false){
+                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                    }
+
+                    if(pedido.HoraDevolucion <= pedido.HoraEntrega){
+                        TempData["ErrorMessage"] = "La hora de devolución debe ser posterior a la hora de entrega.";
+                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                    }
+
+                    descPedido.MaterialId = UI.GetMaterialID(categoria.CategoriaId);
+                    WriteLine($"{descPedido.MaterialId} |   {categoria.CategoriaId}");
+
+                    if(descPedido.MaterialId is null || descPedido.MaterialId == 0){
+                        TempData["ErrorMessage"] = "Ese material no esta disponible.";
+                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                    }
+
+                    if(descPedido.Cantidad < 1){
+                        TempData["ErrorMessage"] = "No puedes introducir números negativos";
+                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                    }
+                    else if(descPedido.Cantidad > 10){
+                        TempData["ErrorMessage"] = "No puedes poner un cantidad tan grande de materiales";
+                        return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                    }
+
+                    WriteLine($"{pedido.CoordinadorId}");
+                    CrudFuntions.AddPedido(pedido, descPedido);
+
+                    pedido.Estado = true;
+                    
+                    TempData["UserType"] = 4;
+                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                }
+                return Page();
+            }
+            catch(Exception ){
+                TempData["ErrorMessage"] = "No puedes poner una cantidad tan grande de materiales";
                 return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
             }
-            return Page();
         }
 
         public IActionResult OnPostNewCat()

@@ -42,75 +42,83 @@ namespace InventoryControlPages
 
         public IActionResult OnPostNewOrder()
         {
-            if ((pedido is not null) && (descPedido is not null) &&  !ModelState.IsValid)
-            {
-                TempData["UserType"] = 2;
-                TempData["Fecha"] = pedido.Fecha;
-                TempData["HoraDevolucion"] = pedido.HoraDevolucion;
+            try{
 
-                int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
-                switch (validateDate){
-                    case 2:
-                        TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                if ((pedido is not null) && (descPedido is not null) &&  !ModelState.IsValid)
+                {
+                    TempData["UserType"] = 2;
+                    TempData["Fecha"] = pedido.Fecha;
+                    TempData["HoraDevolucion"] = pedido.HoraDevolucion;
+
+                    int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
+                    switch (validateDate){
+                        case 2:
+                            TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                            return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
+                        case 3:
+                            TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                            return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
+                        case 4:
+                            TempData["ErrorMessage"] = "Formato de Fecha Incorrecto.";
+                            return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
+                        case 5:
+                            TempData["ErrorMessage"] = "Rellene todos los espacios.";
+                            return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
+                        case 1:
+                            // No hay error, proceder con la lógica normal
+                            break;
+                    }
+
+                    pedido.HoraEntrega = pedido.Fecha;
+
+                    if(UI.HourValidation(pedido.HoraEntrega.ToString()) == false){
+                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
                         return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                    case 3:
-                        TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                    }
+
+
+                    if(UI.HourValidation(pedido.HoraDevolucion.ToString()) == false){
+                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
                         return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                    case 4:
-                        TempData["ErrorMessage"] = "Formato de Fecha Incorrecto.";
+                    }
+
+                    if(pedido.HoraDevolucion <= pedido.HoraEntrega){
+                        TempData["ErrorMessage"] = "La hora de devolución debe ser posterior a la hora de entrega.";
                         return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                    case 5:
-                        TempData["ErrorMessage"] = "Rellene todos los espacios.";
+                    }
+
+                    descPedido.MaterialId = UI.GetMaterialID(categoria.CategoriaId);
+                    WriteLine($"{descPedido.MaterialId} |   {categoria.CategoriaId}");
+
+                    if(descPedido.MaterialId is null || descPedido.MaterialId == 0){
+                        TempData["ErrorMessage"] = "Ese material no esta disponible.";
                         return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                    case 1:
-                        // No hay error, proceder con la lógica normal
-                        break;
-                }
+                    }
 
-                if(UI.HourValidation(pedido.Fecha.ToString()) == false){
-                    TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                    if(descPedido.Cantidad < 1){
+                        TempData["ErrorMessage"] = "No puedes introducir números negativos";
+                        return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
+                    }
+                    else if(descPedido.Cantidad > 10){
+                        TempData["ErrorMessage"] = "No puedes poner un cantidad tan grande de materiales";
+                        return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
+                    }
+
+                    WriteLine($"{pedido.EstudianteId}");
+                    CrudFuntions.AddPedido(pedido, descPedido);
+                    
+                    // Para enviarle el correo al docente
+                    estudiante = db.Estudiantes.FirstOrDefault(e => e.EstudianteId == pedido.EstudianteId);
+                    WriteLine($"{estudiante.EstudianteId}");
+                    //UI.SendNotTeacher(estudiante,descPedido,pedido);
                     return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
                 }
-
-                pedido.HoraEntrega = pedido.Fecha;
-
-                if(UI.HourValidation(pedido.HoraDevolucion.ToString()) == false){
-                    TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
-                    return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                }
-
-                if(pedido.HoraDevolucion <= pedido.HoraEntrega){
-                    TempData["ErrorMessage"] = "La hora de devolución debe ser posterior a la hora de entrega.";
-                    return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                }
-
-                descPedido.MaterialId = UI.GetMaterialID(categoria.CategoriaId);
-                WriteLine($"{descPedido.MaterialId} |   {categoria.CategoriaId}");
-
-                if(descPedido.MaterialId is null || descPedido.MaterialId == 0){
-                    TempData["ErrorMessage"] = "Ese material no esta disponible.";
-                    return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                }
-
-                if(descPedido.Cantidad < 1){
-                    TempData["ErrorMessage"] = "No puedes introducir números negativos";
-                    return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                }
-                else if(descPedido.Cantidad > 10){
-                    TempData["ErrorMessage"] = "No puedes poner un cantidad tan grande de materiales";
-                    return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
-                }
-
-                WriteLine($"{pedido.EstudianteId}");
-                CrudFuntions.AddPedido(pedido, descPedido);
-                
-                // Para enviarle el correo al docente
-                estudiante = db.Estudiantes.FirstOrDefault(e => e.EstudianteId == pedido.EstudianteId);
-                WriteLine($"{estudiante.EstudianteId}");
-                //UI.SendNotTeacher(estudiante,descPedido,pedido);
+                return Page();
+            }
+            catch(Exception ){
+                TempData["ErrorMessage"] = "No puedes poner una cantidad tan grande de materiales";
                 return RedirectToPage("/EstudianteMenu", new{id = pedido.EstudianteId});
             }
-            return Page();
         }
     }
 }

@@ -27,7 +27,6 @@ namespace AlmacenSQLiteEntities
         [StringLength(50)]
         public string Usuario1 { get; set; } = null!;
 
-        
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         [Column(TypeName = "ntext")]
         public string Password { get; set; } = null!;
