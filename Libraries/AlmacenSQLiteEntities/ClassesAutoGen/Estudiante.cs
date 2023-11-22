@@ -23,7 +23,7 @@ namespace AlmacenSQLiteEntities
         [Required(ErrorMessage = "El campo Nombre es obligatorio.")]
         [Column(TypeName = "nvarchar(50)")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "El campo Nombre debe tener entre 2 y 50 caracteres.")]
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "El campo Nombre solo debe contener letras.")]
+        [RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "El campo Nombre solo debe contener letras.")]
         public string Nombre { get; set; } = null!;
 
         [Required(ErrorMessage = "El campo ApellidoPaterno es obligatorio.")]
