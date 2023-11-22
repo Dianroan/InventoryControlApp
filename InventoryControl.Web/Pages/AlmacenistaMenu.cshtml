@@ -696,7 +696,6 @@
 
                         <input asp-for="mantenimiento.Descripcion" placeholder="Descripcion" class="form-control" required>
                         <span asp-validation-for="mantenimiento.Descripcion" class="text-danger"></span>
-                        <span class="text-danger">@Model.ErrorMessage</span>
 
                         <input type="hidden" name="almacenistaId" value="@Model.almacenista.AlmacenistaId" />
                         <input id="enviar" type="submit" />
@@ -798,7 +797,7 @@
                             }
                         </select>
                         <span asp-validation-for="reporteMantenimiento.MaterialId" class="text-danger"></span>
-                        <span class="text-danger">@Model.ErrorMessage</span>
+                        <span class="text-danger">@Model.ErrorMessageAlmacenista</span>
 
                         <input type="hidden" name="almacenistaId" value="@Model.almacenista.AlmacenistaId" />
                         <input id="enviar" type="submit" />

@@ -211,7 +211,7 @@
                         <input type="hidden" asp-for="pedido.DocenteId" value="@Model.docente.DocenteId" />
                         <span asp-validation-for="pedido.DocenteId" class="text-danger"></span>
 
-                        <span class="text-danger">@Model.ErrorMessage</span>
+                        <span class="text-danger">@Model.ErrorMessageDocente</span>
                         <input id="enviar" type="submit" />
                     </div>
                 </form>

@@ -53,7 +53,7 @@ namespace InventoryControlPages
         public ReporteMantenimiento? reporteMantenimiento { get; set; }
         //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
-        public string ErrorMessage { get; set; }
+        public string ErrorMessageAlmacenista { get; set; }
 
         //OnGet para obtener los datos del almacenista con el ID ingresado
         public void OnGet(int id)
@@ -148,6 +148,10 @@ namespace InventoryControlPages
             // Obtener el valor de pedidoId del formulario  
             if ((material is not null) &&  !ModelState.IsValid)
             {
+                if (material.YearEntrada > DateTime.Now.Year){
+                    TempData["ErrorMessage"] = "El campo Año no puede ser mayor que el año actual.";
+                    return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
+                }
                 CrudFuntions.AddMaterial(material);
                 TempData["UserType"] = 3;
                 return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
@@ -182,16 +186,16 @@ namespace InventoryControlPages
                 int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString());
                 switch (validateDate){
                     case 2:
-                        TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                        TempData["ErrorMessageAlmacenista"] = "No se permiten selecciones en sábados ni domingos.";
                         return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
                     case 3:
-                        TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                        TempData["ErrorMessageAlmacenista"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
                         return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
                     case 4:
-                        TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo.";
+                        TempData["ErrorMessageAlmacenista"] = "Formato de fecha incorrecto. Intenta de nuevo.";
                         return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
                     case 5:
-                        TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo.";
+                        TempData["ErrorMessageAlmacenista"] = "Formato de fecha incorrecto. Intenta de nuevo.";
                         return RedirectToPage("/AlmacenistaMenu", new{id = int.Parse(Request.Form["almacenistaId"])});
                     case 1:
                         // No hay error, proceder con la lógica normal

@@ -35,7 +35,9 @@ namespace InventoryControlPages
         [BindProperty]
         public Estudiante? estudiante {get; set;}
         [TempData]
-        public string ErrorMessage { get; set; }
+        public string ErrorMessageLogIn { get; set; }
+        [TempData]
+        public string ErrorMessageSignIn { get; set; }
 
         public IActionResult OnPostLogIn()
         {
@@ -45,7 +47,7 @@ namespace InventoryControlPages
                 var result = UI.LogIn(usuario.Usuario1, usuario.Password);
 
                 if(result.typeOfUser == 0){
-                    TempData["ErrorMessage"] = "Usuario o contraseña incorrectos. Inténtalo nuevamente.";
+                    TempData["ErrorMessageLogIn"] = "Usuario o contraseña incorrectos. Inténtalo nuevamente.";
                 }
 
                 if (result.usuarioEncontrado != null)
@@ -55,7 +57,7 @@ namespace InventoryControlPages
                     TempData["UserType"] = result.typeOfUser;
                     switch(result.typeOfUser){
                         case 0:
-                            TempData["ErrorMessage"] = "Usuario y/o Contraseña incorrecta";
+                            TempData["ErrorMessageLogIn"] = "Usuario y/o Contraseña incorrecta";
                             return Page();
                         case 1:
                             Docente? docente = db.Docentes!.FirstOrDefault(r => r.UsuarioId == result.usuarioEncontrado.UsuarioId);
@@ -85,92 +87,90 @@ namespace InventoryControlPages
 
                 switch (validationRegister)
                 {
+                    case 1:
+                        break;
                     case 10:
-                        TempData["ErrorMessage"] = "El campo Registro debe tener 8 dígitos.";
+                        TempData["ErrorMessageSignIn"] = "El campo Registro debe tener 8 dígitos.";
                         return Page();
                     case 20:
-                        TempData["ErrorMessage"] = "El año en el campo Registro no puede ser mayor al año actual.";
+                        TempData["ErrorMessageSignIn"] = "El año en el campo Registro no puede ser mayor al año actual.";
                         return Page();
                     case 30:
-                        TempData["ErrorMessage"] = "El campo Registro debe comenzar con '100' o '300'.";
+                        TempData["ErrorMessageSignIn"] = "El campo Registro debe contener con '100' o '300'.";
                         return Page();
-                    case 01:
-                        // No hay error, proceder con la lógica normal
-                        break;
                 }
                 
                 int validationEmail = UI.StudentEmailValidation(estudiante.Correo, estudiante.EstudianteId);
 
                 switch (validationEmail)
                 {
+                    case 1:
+                        break;
                     case 10:
-                        TempData["ErrorMessage"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
                         return Page();
                     case 20:
-                        TempData["ErrorMessage"] = "El correo debe contener la letra a al inicio del mismo";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener la letra a al inicio del mismo";
                         return Page();
                     case 30:
-                        TempData["ErrorMessage"] = "El correo debe contener el registro proporcionado.";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener el registro proporcionado.";
                         return Page();
                     case 40:
-                        TempData["ErrorMessage"] = "El correo debe contener la terminación 'ceti.mx'";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener la terminación 'ceti.mx'";
                         return Page();
                     case 50:
-                        TempData["ErrorMessage"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
                         return Page();
                     case 70:
-                        TempData["ErrorMessage"] = "El correo debe contener el registro proporcionado";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener el registro proporcionado";
                         return Page();
                     case 80:
-                        TempData["ErrorMessage"] = "El correo debe contener la terminación 'ceti.mx'";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener la terminación 'ceti.mx'";
                         return Page();
                     case 90:
-                        TempData["ErrorMessage"] = "Formato de Correo Incorrecto";
+                        TempData["ErrorMessageSignIn"] = "Formato de Correo Incorrecto";
                         return Page();
                     case 100:
-                        TempData["ErrorMessage"] = "El correo debe contener la terminación 'ceti.mx'";
+                        TempData["ErrorMessageSignIn"] = "El correo debe contener la terminación 'ceti.mx'";
                         return Page();
-                    case 01:
-                        // No hay error, proceder con la lógica normal
-                        break;
                 }
 
                 int validationPassword = UI.PasswordValidation(usuario.Password);
                 
                 switch (validationPassword)
                 {
-                    case 10:
-                        TempData["ErrorMessage"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
-                        return Page();
-                    case 20:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en mayusculas.";
-                        return Page();
-                    case 30:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter numerico.";
-                        return Page();
-                    case 40:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
-                        return Page();
-                    case 50:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en minúsculas.";
-                        return Page();
-                    case 80:
-                        TempData["ErrorMessage"] = "La contraseña es muy común o fácil de adivinar.";
-                        return Page();
-                    case 90:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
-                        return Page();
-                    case 100:
-                        TempData["ErrorMessage"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
-                        return Page();
-                    case 01:
+                    case 1:
                         // No hay error, proceder con la lógica normal
                         break;
+                    case 10:
+                        TempData["ErrorMessageSignIn"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
+                        return Page();
+                    case 20:
+                        TempData["ErrorMessageSignIn"] = "La contraseña debe contener al menos un caracter en mayusculas.";
+                        return Page();
+                    case 30:
+                        TempData["ErrorMessageSignIn"] = "La contraseña debe contener al menos un caracter numerico.";
+                        return Page();
+                    case 40:
+                        TempData["ErrorMessageSignIn"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
+                        return Page();
+                    case 50:
+                        TempData["ErrorMessageSignIn"] = "La contraseña debe contener al menos un caracter en minúsculas.";
+                        return Page();
+                    case 80:
+                        TempData["ErrorMessageSignIn"] = "La contraseña es muy común o fácil de adivinar.";
+                        return Page();
+                    case 90:
+                        TempData["ErrorMessageSignIn"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
+                        return Page();
+                    case 100:
+                        TempData["ErrorMessageSignIn"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
+                        return Page();
                 }
 
                 foreach(var e in db.Estudiantes){
                     if(e.Correo == estudiante.Correo){
-                        TempData["ErrorMessage"] = "El correo empleado ya tiene un usuario asignado";
+                        TempData["ErrorMessageSignIn"] = "El correo empleado ya tiene un usuario asignado";
                         return Page();
                     }
                 }
@@ -183,10 +183,8 @@ namespace InventoryControlPages
                 UI.NotificationUserName(estudiante);
                 return RedirectToPage("/index", usuario.Usuario1);
             }
-            else
-            {
-                return Page();
-            }
+            TempData["ErrorMessageSignIn"] = "No se pudo hacer el registro del estudiante.";
+            return Page();
         }
         public IActionResult OnPostPass()
         {

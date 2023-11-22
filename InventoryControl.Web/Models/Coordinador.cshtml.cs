@@ -64,7 +64,17 @@ namespace InventoryControlPages
         public ReporteMantenimiento? reporteMantenimiento { get; set; }        
         //Declaramos como TempData el mensaje de error que se enviara a los usuarios
         [TempData]
-        public string ErrorMessage { get; set; }
+        public string ErrorMessagePedido { get; set; }
+        [TempData]
+        public string ErrorMessageReport { get; set; }
+        [TempData]
+        public string ErrorMessageGrupo { get; set; }
+        [TempData]
+        public string ErrorMessageNewDocente { get; set; }
+        [TempData]
+        public string ErrorMessageNewAlmacenista { get; set; }
+        [TempData]
+        public string ErrorMessageNewEstudiante { get; set; }
 
         //OnGet para obtener los datos del coordinador con el ID ingresado
         public void OnGet(int id)
@@ -124,16 +134,16 @@ namespace InventoryControlPages
                 int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
                     switch (validateDate){
                         case 2:
-                            TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                            TempData["ErrorMessagePedido"] = "No se permiten selecciones en sábados ni domingos.";
                             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                         case 3:
-                            TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                            TempData["ErrorMessagePedido"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
                             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                         case 4:
-                            TempData["ErrorMessage"] = "Formato de Fecha Incorrecto.";
+                            TempData["ErrorMessagePedido"] = "Formato de Fecha Incorrecto.";
                             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                         case 5:
-                            TempData["ErrorMessage"] = "Rellene todos los espacios.";
+                            TempData["ErrorMessagePedido"] = "Rellene todos los espacios.";
                             return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                         case 1:
                             // No hay error, proceder con la lógica normal
@@ -143,18 +153,18 @@ namespace InventoryControlPages
                     pedido.HoraEntrega = pedido.Fecha;
 
                     if(UI.HourValidation(pedido.HoraEntrega.ToString()) == false){
-                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                        TempData["ErrorMessagePedido"] = "Horario no válido. Inténtalo de nuevo.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     }
 
 
                     if(UI.HourValidation(pedido.HoraDevolucion.ToString()) == false){
-                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                        TempData["ErrorMessagePedido"] = "Horario no válido. Inténtalo de nuevo.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     }
 
                     if(pedido.HoraDevolucion <= pedido.HoraEntrega){
-                        TempData["ErrorMessage"] = "La hora de devolución debe ser posterior a la hora de entrega.";
+                        TempData["ErrorMessagePedido"] = "La hora de devolución debe ser posterior a la hora de entrega.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     }
 
@@ -162,16 +172,16 @@ namespace InventoryControlPages
                     WriteLine($"{descPedido.MaterialId} |   {categoria.CategoriaId}");
 
                     if(descPedido.MaterialId is null || descPedido.MaterialId == 0){
-                        TempData["ErrorMessage"] = "Ese material no esta disponible.";
+                        TempData["ErrorMessagePedido"] = "Ese material no esta disponible.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     }
 
                     if(descPedido.Cantidad < 1){
-                        TempData["ErrorMessage"] = "No puedes introducir números negativos";
+                        TempData["ErrorMessagePedido"] = "No puedes introducir números negativos";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     }
                     else if(descPedido.Cantidad > 10){
-                        TempData["ErrorMessage"] = "No puedes poner un cantidad tan grande de materiales";
+                        TempData["ErrorMessagePedido"] = "No puedes poner un cantidad tan grande de materiales";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     }
 
@@ -186,7 +196,7 @@ namespace InventoryControlPages
                 return Page();
             }
             catch(Exception ){
-                TempData["ErrorMessage"] = "No puedes poner una cantidad tan grande de materiales";
+                TempData["ErrorMessagePedido"] = "No puedes poner una cantidad tan grande de materiales";
                 return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
             }
         }
@@ -236,6 +246,10 @@ namespace InventoryControlPages
             // Obtener el valor de pedidoId del formulario  
             if ((material is not null) &&  !ModelState.IsValid)
             {
+                if (material.YearEntrada > DateTime.Now.Year){
+                    TempData["ErrorMessage"] = "El campo Año no puede ser mayor que el año actual.";
+                    return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
+                }
                 CrudFuntions.AddMaterial(material);
                 TempData["UserType"] = 4;
                 return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
@@ -270,16 +284,16 @@ namespace InventoryControlPages
                 int validateDate = UI.DateValidationWeb(reporteMantenimiento.Fecha.ToString());
                 switch (validateDate){
                     case 2:
-                        TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                        TempData["ErrorMessageReport"] = "No se permiten selecciones en sábados ni domingos.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 3:
-                        TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                        TempData["ErrorMessageReport"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 4:
-                        TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo.";
+                        TempData["ErrorMessageReport"] = "Formato de fecha incorrecto. Intenta de nuevo.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 5:
-                        TempData["ErrorMessage"] = "Formato de fecha incorrecto. Intenta de nuevo.";
+                        TempData["ErrorMessageReport"] = "Formato de fecha incorrecto. Intenta de nuevo.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 1:
                         // No hay error, proceder con la lógica normal
@@ -311,7 +325,7 @@ namespace InventoryControlPages
             if (grupoExistente)
             {
                 // Establece el mensaje de error en el modelo
-                TempData["ErrorMessage"] = "El grupo ya existe. Introduce un nombre de grupo único.";
+                TempData["ErrorMessageGrupo"] = "El grupo ya existe. Introduce un nombre de grupo único.";
                 return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
             }
 
@@ -319,7 +333,7 @@ namespace InventoryControlPages
             if (!Regex.IsMatch(grupo.Nombre, "^[A-Za-z][0-9]$"))
             {
                 // Establece el mensaje de error en el modelo
-                TempData["ErrorMessage"] = "El formato del nombre no es válido. Debe ser una letra seguida de un número.";
+                TempData["ErrorMessageGrupo"] = "El formato del nombre no es válido. Debe ser una letra seguida de un número.";
                 return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
             }
 
@@ -345,13 +359,13 @@ namespace InventoryControlPages
                 switch (validationRegister)
                 {
                     case 10:
-                        TempData["ErrorMessage"] = "El campo Registro debe tener 8 dígitos.";
+                        TempData["ErrorMessageNewEstudiante"] = "El campo Registro debe tener 8 dígitos.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 20:
-                        TempData["ErrorMessage"] = "El año en el campo Registro no puede ser mayor al año actual.";
+                        TempData["ErrorMessageNewEstudiante"] = "El año en el campo Registro no puede ser mayor al año actual.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 30:
-                        TempData["ErrorMessage"] = "El campo Registro debe comenzar con '100' o '300'.";
+                        TempData["ErrorMessageNewEstudiante"] = "El campo Registro debe comenzar con '100' o '300'.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 01:
                         // No hay error, proceder con la lógica normal
@@ -364,31 +378,31 @@ namespace InventoryControlPages
                 switch (validationEmail)
                 {
                     case 10:
-                        TempData["ErrorMessage"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 20:
-                        TempData["ErrorMessage"] = "El correo debe contener la letra a al inicio del mismo";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener la letra a al inicio del mismo";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 30:
-                        TempData["ErrorMessage"] = "El correo debe contener el registro proporcionado.";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener el registro proporcionado.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 40:
-                        TempData["ErrorMessage"] = "El correo debe contener la terminación 'ceti.mx'";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener la terminación 'ceti.mx'";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 50:
-                        TempData["ErrorMessage"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener 17 caracteres, ejemplo: 'a19300107@ceti.mx'";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 70:
-                        TempData["ErrorMessage"] = "El correo debe contener el registro proporcionado";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener el registro proporcionado";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 80:
-                        TempData["ErrorMessage"] = "El correo debe contener la terminación 'ceti.mx'";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener la terminación 'ceti.mx'";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 90:
-                        TempData["ErrorMessage"] = "Formato de Correo Incorrecto";
+                        TempData["ErrorMessageNewEstudiante"] = "Formato de Correo Incorrecto";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 100:
-                        TempData["ErrorMessage"] = "El correo debe contener la terminación 'ceti.mx'";
+                        TempData["ErrorMessageNewEstudiante"] = "El correo debe contener la terminación 'ceti.mx'";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 01:
                         // No hay error, proceder con la lógica normal
@@ -400,28 +414,28 @@ namespace InventoryControlPages
                 switch (validationPassword)
                 {
                     case 10:
-                        TempData["ErrorMessage"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 20:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en mayusculas.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña debe contener al menos un caracter en mayusculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 30:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter numerico.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña debe contener al menos un caracter numerico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 40:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 50:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en minúsculas.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña debe contener al menos un caracter en minúsculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 80:
-                        TempData["ErrorMessage"] = "La contraseña es muy común o fácil de adivinar.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña es muy común o fácil de adivinar.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 90:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 100:
-                        TempData["ErrorMessage"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
+                        TempData["ErrorMessageNewEstudiante"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 01:
                         // No hay error, proceder con la lógica normal
@@ -447,7 +461,7 @@ namespace InventoryControlPages
             {
                 //Valida que el correo del docente sea valido
                 if(!UI.EmailValidation(docente.Correo)){
-                    TempData["ErrorMessage"] = "Correo electrónico invalido";
+                    TempData["ErrorMessageNewDocente"] = "Correo electrónico invalido";
                     return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                 }
 
@@ -457,28 +471,28 @@ namespace InventoryControlPages
                 switch (validationPassword)
                 {
                     case 10:
-                        TempData["ErrorMessage"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 20:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en mayusculas.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña debe contener al menos un caracter en mayusculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 30:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter numerico.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña debe contener al menos un caracter numerico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 40:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 50:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en minúsculas.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña debe contener al menos un caracter en minúsculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 80:
-                        TempData["ErrorMessage"] = "La contraseña es muy común o fácil de adivinar.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña es muy común o fácil de adivinar.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 90:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 100:
-                        TempData["ErrorMessage"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
+                        TempData["ErrorMessageNewDocente"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 01:
                         // No hay error, proceder con la lógica normal
@@ -502,7 +516,7 @@ namespace InventoryControlPages
             {
                 //Verifica que el Email este correcto
                 if(!UI.EmailValidation(almacenista.Correo)){
-                    TempData["ErrorMessage"] = "Correo electrónico invalido";
+                    TempData["ErrorMessageNewAlmacenista"] = "Correo electrónico invalido";
                     return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                 }
 
@@ -512,28 +526,28 @@ namespace InventoryControlPages
                 switch (validationPassword)
                 {
                     case 10:
-                        TempData["ErrorMessage"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña es muy corta. Debe tener al menos 8 caracteres.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 20:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en mayusculas.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña debe contener al menos un caracter en mayusculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 30:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter numerico.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña debe contener al menos un caracter numerico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 40:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña debe contener al menos un caracter especial no alfanumérico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 50:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter en minúsculas.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña debe contener al menos un caracter en minúsculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 80:
-                        TempData["ErrorMessage"] = "La contraseña es muy común o fácil de adivinar.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña es muy común o fácil de adivinar.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 90:
-                        TempData["ErrorMessage"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña debe contener al menos un caracter no alfanumérico.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 100:
-                        TempData["ErrorMessage"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
+                        TempData["ErrorMessageNewAlmacenista"] = "La contraseña debe contener una combinación de mayúsculas y minúsculas.";
                         return RedirectToPage("/CoordinadorMenu", new{id = int.Parse(Request.Form["coordinadorId"])});
                     case 01:
                         // No hay error, proceder con la lógica normal

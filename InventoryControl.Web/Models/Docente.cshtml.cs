@@ -32,7 +32,7 @@ namespace InventoryControlPages
         [BindProperty]
         public Categoria? categoria { get; set; }
         [TempData]
-        public string ErrorMessage { get; set; }
+        public string ErrorMessageDocente { get; set; }
 
         public void OnGet(int id)
         {
@@ -53,16 +53,16 @@ namespace InventoryControlPages
                     int validateDate = UI.DateValidationWeb(pedido.Fecha.ToString());
                     switch (validateDate){
                         case 2:
-                            TempData["ErrorMessage"] = "No se permiten selecciones en sábados ni domingos.";
+                            TempData["ErrorMessageDocente"] = "No se permiten selecciones en sábados ni domingos.";
                             return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                         case 3:
-                            TempData["ErrorMessage"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
+                            TempData["ErrorMessageDocente"] = "La fecha debe ser un día posterior al día actual y no mayor a una semana.";
                             return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                         case 4:
-                            TempData["ErrorMessage"] = "Formato de Fecha Incorrecto.";
+                            TempData["ErrorMessageDocente"] = "Formato de Fecha Incorrecto.";
                             return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                         case 5:
-                            TempData["ErrorMessage"] = "Rellene todos los espacios.";
+                            TempData["ErrorMessageDocente"] = "Rellene todos los espacios.";
                             return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                         case 1:
                             // No hay error, proceder con la lógica normal
@@ -72,18 +72,18 @@ namespace InventoryControlPages
                     pedido.HoraEntrega = pedido.Fecha;
 
                     if(UI.HourValidation(pedido.HoraEntrega.ToString()) == false){
-                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                        TempData["ErrorMessageDocente"] = "Horario no válido. Inténtalo de nuevo.";
                         return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                     }
 
 
                     if(UI.HourValidation(pedido.HoraDevolucion.ToString()) == false){
-                        TempData["ErrorMessage"] = "Horario no válido. Inténtalo de nuevo.";
+                        TempData["ErrorMessageDocente"] = "Horario no válido. Inténtalo de nuevo.";
                         return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                     }
 
                     if(pedido.HoraDevolucion <= pedido.HoraEntrega){
-                        TempData["ErrorMessage"] = "La hora de devolución debe ser posterior a la hora de entrega.";
+                        TempData["ErrorMessageDocente"] = "La hora de devolución debe ser posterior a la hora de entrega.";
                         return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                     }
 
@@ -91,16 +91,16 @@ namespace InventoryControlPages
                     WriteLine($"{descPedido.MaterialId} |   {categoria.CategoriaId}");
 
                     if(descPedido.MaterialId is null || descPedido.MaterialId == 0){
-                        TempData["ErrorMessage"] = "Ese material no esta disponible.";
+                        TempData["ErrorMessageDocente"] = "Ese material no esta disponible.";
                         return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                     }
 
                     if(descPedido.Cantidad < 1){
-                        TempData["ErrorMessage"] = "No puedes introducir números negativos";
+                        TempData["ErrorMessageDocente"] = "No puedes introducir números negativos";
                         return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                     }
                     else if(descPedido.Cantidad > 10){
-                        TempData["ErrorMessage"] = "No puedes poner un cantidad tan grande de materiales";
+                        TempData["ErrorMessageDocente"] = "No puedes poner un cantidad tan grande de materiales";
                         return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
                     }
 
@@ -113,7 +113,7 @@ namespace InventoryControlPages
                 return Page();
             }
             catch(Exception ){
-                TempData["ErrorMessage"] = "No puedes poner una cantidad tan grande de materiales";
+                TempData["ErrorMessageDocente"] = "No puedes poner una cantidad tan grande de materiales";
                 return RedirectToPage("/DocenteMenu", new{id = pedido.DocenteId});
             }
         }
