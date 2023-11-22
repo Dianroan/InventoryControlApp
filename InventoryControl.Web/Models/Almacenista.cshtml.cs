@@ -17,13 +17,13 @@ namespace InventoryControlPages
         //Declaramos la propiedad para la base de datos
         private Almacen db;
 
-        //Instanciamos la propiedad anterior con los datos de la base de datos de almacen
+        // Constructor que inicializa la base de datos
         public AlmacenistaModel(Almacen context)
         {
             db = context;
         } 
 
-        //Declaramos la lista con toda la informacion de la clase almacenistas
+        //Declaramos la lista para objetos almacenistas
         public List<Almacenista>? almacenistas { get; set; }
 
         //Declaramos como Bind property todas las propiedades de enlace que vamos a usar para crear nuevos objetos de sus clases
