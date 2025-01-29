@@ -15,6 +15,7 @@ public static partial class UI
             switch (res)
             {
                 case "1":
+                WriteLine("HOLA");
                 WriteLine("Ingresa tu usuario:");
                 string userName = ReadLine()??"";
                 WriteLine("Ingresa tu contraseña:");
